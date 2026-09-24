@@ -310,6 +310,10 @@
     - role: galaxy/endlessh
     # /role-specific:endlessh
 
+    # role-specific:ente
+    - role: galaxy/ente
+    # /role-specific:ente
+
     # role-specific:ergo
     - role: galaxy/ergo
     # /role-specific:ergo

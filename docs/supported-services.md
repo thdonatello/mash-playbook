@@ -84,6 +84,7 @@ Below is an exhaustive list of the free and open-source software for self-hostin
 | [Duplicati](https://duplicati.com) | Backup software that securely stores encrypted, incremental, compressed backups on local storage, cloud storage services and remote file servers | [Link](services/duplicati.md) |
 | [echoip](https://github.com/mpolden/echoip) | Look up your IP address | [Link](services/echoip.md) |
 | [Endlessh-go](https://github.com/shizunge/endlessh-go) | A Golang implementation of Endlessh, an SSH tarpit | [Link](services/endlessh.md) |
+| [Ente](https://ente.io) | End-to-end encrypted photo storage | [Link](services/ente.md) |
 | [Ergo](https://ergo.chat/) | Modern IRCd (IRC server software) | [Link](services/ergo.md) |
 | [etcd](https://etcd.io/) | A distributed, reliable key-value store for the most critical data of a distributed system | [Link](services/etcd.md) |
 | [Etherpad](https://etherpad.org) | Collaborative text editor | [Link](services/etherpad.md) |

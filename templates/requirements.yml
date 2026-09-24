@@ -240,6 +240,10 @@
   version: v2026.0730.0-1
   name: endlessh
   activation_prefix: endlessh_
+- src: git+https://gitlab.com/th-ansible/roles/ansible-role-ente.git
+  version: v0.0.0-0
+  name: ente
+  activation_prefix: ente_
 - src: git+https://progressiv.radicle.garden/z2CSxS3YLtJYM87TyGZkZCan3uoSJ.git
   version: v2.19.1-0
   name: ergo

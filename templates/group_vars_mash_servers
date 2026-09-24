@@ -414,6 +414,13 @@ mash_playbook_devture_systemd_service_manager_services_list_auto_itemized:
     {{ ({'name': (endlessh_identifier + '.service'), 'priority': 2000, 'restart_necessary': (endlessh_restart_necessary | bool), 'groups': ['mash', 'endlessh']} if endlessh_enabled else omit) }}
   # /role-specific:endlessh
 
+  # role-specific:ente
+  - |-
+    {{ ({'name': (ente_museum_identifier + '.service'), 'priority': 2000, 'restart_necessary': (ente_museum_restart_necessary | bool), 'groups': ['mash', 'ente']} if ente_enabled and ente_museum_enabled else omit) }}
+  - |-
+    {{ ({'name': (ente_web_identifier + '.service'), 'priority': 2000, 'restart_necessary': (ente_web_restart_necessary | bool), 'groups': ['mash', 'ente']} if ente_enabled and ente_web_enabled else omit) }}
+  # /role-specific:ente
+
   # role-specific:ergo
   - |-
     {{ ({'name': (ergo_identifier + '.service'), 'priority': 2000, 'restart_necessary': (ergo_restart_necessary | bool), 'groups': ['mash', 'ergo']} if ergo_enabled else omit) }}
@@ -1694,6 +1701,17 @@ mash_playbook_postgres_managed_databases_auto_itemized:
       } if donetick_enabled and donetick_database_hostname == postgres_connection_hostname and donetick_database_type == 'postgres' else omit)
     }}
   # /role-specific:donetick
+
+  # role-specific:ente
+  - |-
+    {{
+      ({
+        'name': ente_museum_database_name,
+        'username': ente_museum_database_username,
+        'password': ente_museum_database_password,
+      } if ente_enabled and ente_museum_enabled and ente_museum_database_hostname == postgres_connection_hostname else omit)
+    }}
+  # /role-specific:ente
 
   # role-specific:ergo
   - |-
@@ -5811,6 +5829,89 @@ endlessh_container_labels_traefik_tcp_loadbalancer_serverstransport: "{{ traefik
 #                                                                      #
 ########################################################################
 # /role-specific:endlessh
+
+
+
+# role-specific:ente
+########################################################################
+#                                                                      #
+# ente                                                                 #
+#                                                                      #
+########################################################################
+
+ente_enabled: false
+
+ente_identifier: "{{ mash_playbook_service_identifier_prefix }}ente"
+
+ente_base_path: "{{ mash_playbook_base_path }}/{{ mash_playbook_service_base_directory_name_prefix }}ente"
+
+ente_uid: "{{ mash_playbook_uid }}"
+ente_gid: "{{ mash_playbook_gid }}"
+
+ente_museum_systemd_required_services_list_auto: |
+  {{
+    ([postgres_identifier ~ '.service'] if postgres_enabled and ente_museum_database_hostname == postgres_connection_hostname else [])
+  }}
+
+ente_museum_systemd_wanted_services_list_auto: |
+  {{
+    ([exim_relay_identifier ~ '.service'] if exim_relay_enabled | default(false) and ente_museum_smtp_host == exim_relay_identifier else [])
+  }}
+
+ente_museum_container_additional_networks_auto: |
+  {{
+    (
+      ([mash_playbook_reverse_proxyable_services_additional_network] if mash_playbook_reverse_proxyable_services_additional_network else [])
+      +
+      ([postgres_container_network] if postgres_enabled and ente_museum_database_hostname == postgres_connection_hostname and ente_museum_container_network != postgres_container_network else [])
+      +
+      ([exim_relay_container_network] if exim_relay_enabled | default(false) and ente_museum_smtp_host == exim_relay_identifier and ente_museum_container_network != exim_relay_container_network else [])
+    ) | unique
+  }}
+
+ente_museum_container_labels_traefik_enabled: "{{ mash_playbook_traefik_labels_enabled }}"
+ente_museum_container_labels_traefik_docker_network: "{{ mash_playbook_reverse_proxyable_services_additional_network }}"
+ente_museum_container_labels_traefik_compression_middleware_enabled: "{{ mash_playbook_reverse_proxy_traefik_middleware_compession_enabled }}"
+ente_museum_container_labels_traefik_compression_middleware_name: "{{ mash_playbook_reverse_proxy_traefik_middleware_compession_name if mash_playbook_reverse_proxy_traefik_middleware_compession_enabled else '' }}"
+
+ente_web_container_additional_networks_auto: |
+  {{
+    ([mash_playbook_reverse_proxyable_services_additional_network] if mash_playbook_reverse_proxyable_services_additional_network else [])
+  }}
+
+ente_web_container_labels_traefik_enabled: "{{ mash_playbook_traefik_labels_enabled }}"
+ente_web_container_labels_traefik_docker_network: "{{ mash_playbook_reverse_proxyable_services_additional_network }}"
+ente_web_container_labels_traefik_compression_middleware_enabled: "{{ mash_playbook_reverse_proxy_traefik_middleware_compession_enabled }}"
+ente_web_container_labels_traefik_compression_middleware_name: "{{ mash_playbook_reverse_proxy_traefik_middleware_compession_name if mash_playbook_reverse_proxy_traefik_middleware_compession_enabled else '' }}"
+
+# role-specific:traefik
+ente_museum_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
+ente_museum_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
+ente_web_container_labels_traefik_entrypoints: "{{ traefik_entrypoint_primary }}"
+ente_web_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_primary }}"
+# /role-specific:traefik
+
+# role-specific:exim_relay
+ente_museum_smtp_enabled: "{{ exim_relay_enabled | default(false) }}"
+ente_museum_smtp_host: "{{ exim_relay_identifier if exim_relay_enabled | default(false) else '' }}"
+ente_museum_smtp_port: 8025
+ente_museum_smtp_email: "{{ exim_relay_sender_address if exim_relay_enabled | default(false) else '' }}"
+# /role-specific:exim_relay
+
+# role-specific:postgres
+ente_museum_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
+ente_museum_database_port: "{{ postgres_connection_port if postgres_enabled else 5432 }}"
+ente_museum_database_name: "{{ ente_identifier }}"
+ente_museum_database_username: "{{ ente_identifier }}"
+ente_museum_database_password: "{{ (mash_playbook_generic_secret_key + ':db.ente') | hash('sha512') | to_uuid }}"
+# /role-specific:postgres
+
+########################################################################
+#                                                                      #
+# /ente                                                                #
+#                                                                      #
+########################################################################
+# /role-specific:ente
 
 
 
