@@ -1526,6 +1526,10 @@ mash_playbook_devture_systemd_service_manager_services_list_auto_itemized:
     {{ ({'name': (writefreely_identifier  + '.service'), 'priority': 2000, 'restart_necessary': (writefreely_restart_necessary | bool), 'groups': ['mash', 'writefreely']} if writefreely_enabled else omit) }}
   # /role-specific:writefreely
 
+  # role-specific:xray
+  - |-
+    {{ ({'name': (xray_identifier + '.service'), 'priority': 2000, 'restart_necessary': (xray_restart_necessary | bool), 'groups': ['mash', 'xray']} if xray_enabled else omit) }}
+  # /role-specific:xray
   # role-specific:yacy
   - |-
     {{ ({'name': (yacy_identifier + '.service'), 'priority': 2000, 'restart_necessary': (yacy_restart_necessary | bool), 'groups': ['mash', 'yacy']} if yacy_enabled else omit) }}
@@ -18267,6 +18271,29 @@ writefreely_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_
 ########################################################################
 # /role-specific:writefreely
 
+
+# role-specific:xray
+########################################################################
+#                                                                      #
+# xray                                                                 #
+#                                                                      #
+########################################################################
+
+xray_enabled: false
+
+xray_identifier: "{{ mash_playbook_service_identifier_prefix }}xray"
+
+xray_base_path: "{{ mash_playbook_base_path }}/{{ mash_playbook_service_base_directory_name_prefix }}xray"
+
+xray_uid: "{{ mash_playbook_uid }}"
+xray_gid: "{{ mash_playbook_gid }}"
+
+########################################################################
+#                                                                      #
+# /xray                                                                #
+#                                                                      #
+########################################################################
+# /role-specific:xray
 
 
 # role-specific:yacy

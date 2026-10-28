@@ -1146,6 +1146,10 @@
     - role: galaxy/writefreely
     # /role-specific:writefreely
 
+    # role-specific:xray
+    - role: galaxy/xray
+    # /role-specific:xray
+
     # role-specific:yacy
     - role: galaxy/yacy
     # /role-specific:yacy
