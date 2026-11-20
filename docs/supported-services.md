@@ -136,6 +136,7 @@ Below is an exhaustive list of the free and open-source software for self-hostin
 | [Jellyfin](https://github.com/jellyfin/jellyfin) | A personal media server | [Link](services/jellyfin.md) |
 | [Jitsi](https://jitsi.org/) | A fully encrypted video conferencing solution | [Link](services/jitsi.md) |
 | [Joplin Server](https://joplinapp.org/help/dev/spec/architecture#joplin-server) | Server component for [Joplin](https://joplinapp.org/) | [Link](services/joplin-server.md) |
+| [Apache Kafka](https://kafka.apache.org/) | Event streaming platform (single node, KRaft) | [Link](services/kafka.md) |
 | [Kanboard](https://kanboard.org/) | Kanban project management software | [Link](services/kanboard.md) |
 | [Karakeep](https://karakeep.app/) | Bookmark manager to collect, organize and archive webpages | [Link](services/karakeep.md) |
 | [Keycloak](https://www.keycloak.org/) | An identity and access management solution | [Link](services/keycloak.md) |
@@ -223,6 +224,7 @@ Below is an exhaustive list of the free and open-source software for self-hostin
 | [Promtail](https://grafana.com/docs/loki/latest/send-data/promtail/) | Agent which ships the contents of local logs to a private [Grafana Loki](services/grafana-loki.md) instance | [Link](services/promtail.md) |
 | [Prowlarr](https://prowlarr.com/) | An indexer manager/proxy for Usenet and BitTorrent users | [Link](services/prowlarr.md) |
 | [PruneMate](https://github.com/anoniemerd/PruneMate) | Automatically clean up Docker resources on a schedule | [Link](services/prunemate.md) |
+| [ptrain](https://gitlab.com/youradmin_guru/ptrain) | Trainer Telegram bot and Mini App | [Link](services/ptrain.md) |
 | [qBittorrent](https://www.qbittorrent.org/) | A BitTorrent client | [Link](services/qbittorrent.md) |
 | [qui](https://getqui.com/) | A fast, modern web interface for qBittorrent | [Link](services/qui.md) |
 | [RabbitMQ](https://www.rabbitmq.com/) | Message-broker which supports AMQP, STOMP, MQTT, etc. | [Link](services/rabbitmq.md) |

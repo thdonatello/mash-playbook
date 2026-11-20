@@ -510,6 +510,10 @@
     - role: galaxy/joplin_server
     # /role-specific:joplin_server
 
+    # role-specific:kafka
+    - role: galaxy/kafka
+    # /role-specific:kafka
+
     # role-specific:kanboard
     - role: galaxy/kanboard
     # /role-specific:kanboard
@@ -885,6 +889,10 @@
     # role-specific:prunemate
     - role: galaxy/prunemate
     # /role-specific:prunemate
+
+    # role-specific:ptrain
+    - role: galaxy/ptrain
+    # /role-specific:ptrain
 
     # role-specific:qbittorrent
     - role: galaxy/qbittorrent

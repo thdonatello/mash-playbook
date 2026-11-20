@@ -687,6 +687,11 @@ mash_playbook_devture_systemd_service_manager_services_list_auto_itemized:
     {{ ({'name': (joplin_server_identifier + '.service'), 'priority': 2000, 'restart_necessary': (joplin_server_restart_necessary | bool), 'groups': ['mash', 'joplin-server']} if joplin_server_enabled else omit) }}
   # /role-specific:joplin_server
 
+  # role-specific:kafka
+  - |-
+    {{ ({'name': (kafka_identifier + '.service'), 'priority': 1500, 'restart_necessary': (kafka_restart_necessary | bool), 'groups': ['mash', 'kafka']} if kafka_enabled else omit) }}
+  # /role-specific:kafka
+
   # role-specific:kanboard
   - |-
     {{ ({'name': (kanboard_identifier + '.service'), 'priority': 2000, 'restart_necessary': (kanboard_restart_necessary | bool), 'groups': ['mash', 'kanboard']} if kanboard_enabled else omit) }}
@@ -1185,6 +1190,21 @@ mash_playbook_devture_systemd_service_manager_services_list_auto_itemized:
   - |-
     {{ ({'name': (prunemate_identifier + '.service'), 'priority': 2000, 'restart_necessary': (prunemate_restart_necessary | bool), 'groups': ['mash', 'prunemate']} if prunemate_enabled else omit) }}
   # /role-specific:prunemate
+
+  # role-specific:ptrain
+  - |-
+    {{ ({'name': (ptrain_identifier + '-prod-bot.service'), 'priority': 2000, 'restart_necessary': (ptrain_prod_restart_necessary | bool), 'groups': ['mash', 'ptrain', 'ptrain-prod']} if ptrain_prod_enabled else omit) }}
+  - |-
+    {{ ({'name': (ptrain_identifier + '-prod-app.service'), 'priority': 2100, 'restart_necessary': (ptrain_prod_restart_necessary | bool), 'groups': ['mash', 'ptrain', 'ptrain-prod']} if ptrain_prod_enabled else omit) }}
+  - |-
+    {{ ({'name': (ptrain_identifier + '-prod-web.service'), 'priority': 2100, 'restart_necessary': (ptrain_prod_restart_necessary | bool), 'groups': ['mash', 'ptrain', 'ptrain-prod']} if ptrain_prod_enabled else omit) }}
+  - |-
+    {{ ({'name': (ptrain_identifier + '-test-bot.service'), 'priority': 2000, 'restart_necessary': (ptrain_test_restart_necessary | bool), 'groups': ['mash', 'ptrain', 'ptrain-test']} if ptrain_test_enabled else omit) }}
+  - |-
+    {{ ({'name': (ptrain_identifier + '-test-app.service'), 'priority': 2100, 'restart_necessary': (ptrain_test_restart_necessary | bool), 'groups': ['mash', 'ptrain', 'ptrain-test']} if ptrain_test_enabled else omit) }}
+  - |-
+    {{ ({'name': (ptrain_identifier + '-test-web.service'), 'priority': 2100, 'restart_necessary': (ptrain_test_restart_necessary | bool), 'groups': ['mash', 'ptrain', 'ptrain-test']} if ptrain_test_enabled else omit) }}
+  # /role-specific:ptrain
 
   # role-specific:qbittorrent
   - |-
@@ -2329,6 +2349,45 @@ mash_playbook_postgres_managed_databases_auto_itemized:
       } if prometheus_postgres_exporter_enabled and prometheus_postgres_exporter_database_hostname == postgres_connection_hostname else omit)
     }}
   # /role-specific:prometheus_postgres_exporter
+
+  # role-specific:ptrain
+  - |-
+    {{
+      ({
+        'name': ptrain_prod_database_name,
+        'username': 'migrator_prod',
+        'password': ptrain_prod_database_migrator_password,
+        'additional_sql_queries': [
+          ('\c ' ~ ptrain_prod_database_name),
+          "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_prod') THEN CREATE ROLE app_prod LOGIN; END IF; END $$;",
+          "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'bot_prod') THEN CREATE ROLE bot_prod LOGIN; END IF; END $$;",
+          ("ALTER ROLE app_prod PASSWORD '" ~ ptrain_prod_database_app_password ~ "';"),
+          ("ALTER ROLE bot_prod PASSWORD '" ~ ptrain_prod_database_bot_password ~ "';"),
+          ('GRANT CONNECT ON DATABASE ' ~ ptrain_prod_database_name ~ ' TO app_prod, bot_prod;'),
+          'GRANT USAGE ON SCHEMA public TO app_prod, bot_prod;',
+          ('\c ' ~ postgres_db_name),
+        ],
+      } if ptrain_prod_enabled else omit)
+    }}
+  - |-
+    {{
+      ({
+        'name': ptrain_test_database_name,
+        'username': 'migrator_test',
+        'password': ptrain_test_database_migrator_password,
+        'additional_sql_queries': [
+          ('\c ' ~ ptrain_test_database_name),
+          "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_test') THEN CREATE ROLE app_test LOGIN; END IF; END $$;",
+          "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'bot_test') THEN CREATE ROLE bot_test LOGIN; END IF; END $$;",
+          ("ALTER ROLE app_test PASSWORD '" ~ ptrain_test_database_app_password ~ "';"),
+          ("ALTER ROLE bot_test PASSWORD '" ~ ptrain_test_database_bot_password ~ "';"),
+          ('GRANT CONNECT ON DATABASE ' ~ ptrain_test_database_name ~ ' TO app_test, bot_test;'),
+          'GRANT USAGE ON SCHEMA public TO app_test, bot_test;',
+          ('\c ' ~ postgres_db_name),
+        ],
+      } if ptrain_test_enabled else omit)
+    }}
+  # /role-specific:ptrain
 
   # role-specific:readeck
   - |-
@@ -9655,6 +9714,39 @@ joplin_server_container_labels_traefik_tls_certResolver: "{{ traefik_certResolve
 
 
 
+# role-specific:kafka
+########################################################################
+#                                                                      #
+# kafka                                                                #
+#                                                                      #
+########################################################################
+
+kafka_enabled: false
+
+kafka_identifier: "{{ mash_playbook_service_identifier_prefix }}kafka"
+
+kafka_base_path: "{{ mash_playbook_base_path }}/{{ mash_playbook_service_base_directory_name_prefix }}kafka"
+
+kafka_uid: "{{ mash_playbook_uid }}"
+kafka_gid: "{{ mash_playbook_gid }}"
+
+kafka_topics_auto: |
+  {{
+    []
+    # role-specific:ptrain
+    + (ptrain_kafka_topics if ptrain_enabled | bool else [])
+    # /role-specific:ptrain
+  }}
+
+########################################################################
+#                                                                      #
+# /kafka                                                               #
+#                                                                      #
+########################################################################
+# /role-specific:kafka
+
+
+
 # role-specific:kanboard
 ########################################################################
 #                                                                      #
@@ -15146,6 +15238,72 @@ prunemate_container_labels_traefik_tls_certResolver: "{{ traefik_certResolver_pr
 #                                                                      #
 ########################################################################
 # /role-specific:prunemate
+
+
+
+# role-specific:ptrain
+########################################################################
+#                                                                      #
+# ptrain                                                               #
+#                                                                      #
+########################################################################
+
+ptrain_prod_enabled: false
+ptrain_test_enabled: false
+
+# Repeated from the role defaults: kafka_topics_auto above reads it.
+ptrain_enabled: "{{ ptrain_prod_enabled | bool or ptrain_test_enabled | bool }}"
+
+ptrain_identifier: "{{ mash_playbook_service_identifier_prefix }}ptrain"
+
+ptrain_base_path: "{{ mash_playbook_base_path }}/{{ mash_playbook_service_base_directory_name_prefix }}ptrain"
+
+ptrain_uid: "{{ mash_playbook_uid }}"
+ptrain_gid: "{{ mash_playbook_gid }}"
+
+ptrain_container_traefik_network: "{{ mash_playbook_reverse_proxyable_services_additional_network }}"
+
+# Topics with the environment prefix: events 7 days, dead letters 30 days (NFR4.3-NFR4.5).
+ptrain_kafka_topics: |
+  {{
+    ([
+      {'name': 'prod.questionnaire-events', 'partitions': 1, 'retention_ms': 604800000},
+      {'name': 'prod.questionnaire-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
+    ] if ptrain_prod_enabled else [])
+    +
+    ([
+      {'name': 'test.questionnaire-events', 'partitions': 1, 'retention_ms': 604800000},
+      {'name': 'test.questionnaire-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
+    ] if ptrain_test_enabled else [])
+  }}
+
+# role-specific:postgres
+ptrain_database_hostname: "{{ postgres_connection_hostname if postgres_enabled else '' }}"
+ptrain_database_port: "{{ postgres_connection_port if postgres_enabled else 5432 }}"
+ptrain_database_container_network: "{{ postgres_container_network if postgres_enabled else '' }}"
+ptrain_systemd_required_services_list_auto: "{{ [postgres_identifier ~ '.service'] if postgres_enabled else [] }}"
+ptrain_backup_postgres_container: "{{ postgres_identifier }}"
+ptrain_backup_postgres_username: "{{ postgres_connection_username }}"
+ptrain_prod_database_app_password: "{{ (mash_playbook_generic_secret_key + ':db.ptrain.prod.app') | hash('sha512') | to_uuid }}"
+ptrain_prod_database_bot_password: "{{ (mash_playbook_generic_secret_key + ':db.ptrain.prod.bot') | hash('sha512') | to_uuid }}"
+ptrain_prod_database_migrator_password: "{{ (mash_playbook_generic_secret_key + ':db.ptrain.prod.migrator') | hash('sha512') | to_uuid }}"
+ptrain_test_database_app_password: "{{ (mash_playbook_generic_secret_key + ':db.ptrain.test.app') | hash('sha512') | to_uuid }}"
+ptrain_test_database_bot_password: "{{ (mash_playbook_generic_secret_key + ':db.ptrain.test.bot') | hash('sha512') | to_uuid }}"
+ptrain_test_database_migrator_password: "{{ (mash_playbook_generic_secret_key + ':db.ptrain.test.migrator') | hash('sha512') | to_uuid }}"
+# /role-specific:postgres
+
+# role-specific:kafka
+ptrain_kafka_bootstrap_servers: "{{ kafka_identifier }}:9092"
+ptrain_kafka_container_network: "{{ kafka_container_network }}"
+ptrain_systemd_wanted_services_list_auto: "{{ [kafka_identifier ~ '.service'] if kafka_enabled else [] }}"
+# /role-specific:kafka
+
+########################################################################
+#                                                                      #
+# /ptrain                                                              #
+#                                                                      #
+########################################################################
+# /role-specific:ptrain
 
 
 

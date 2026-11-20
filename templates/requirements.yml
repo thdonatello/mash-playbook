@@ -448,6 +448,10 @@
   version: v3.7.2-0
   name: joplin_server
   activation_prefix: joplin_server_
+- src: git+https://gitlab.com/th-ansible/roles/ansible-role-kafka.git
+  version: v0.0.0-0
+  name: kafka
+  activation_prefix: kafka_
 - src: git+https://progressiv.radicle.garden/z2LZH9TGMxYbGBaGoMHNFX5HymEL3.git
   version: v1.2.56-0
   name: kanboard
@@ -840,6 +844,10 @@
   version: v1.3.3-4
   name: prunemate
   activation_prefix: prunemate_
+- src: git+ssh://git@gitlab.com/th-ansible/roles/ansible-role-ptrain.git
+  version: v0.0.0-0
+  name: ptrain
+  activation_prefix: ptrain_
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-qbittorrent.git
   version: v5.3.0-0
   name: qbittorrent
