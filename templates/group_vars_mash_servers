@@ -15269,11 +15269,15 @@ ptrain_kafka_topics: |
     ([
       {'name': 'prod.questionnaire-events', 'partitions': 1, 'retention_ms': 604800000},
       {'name': 'prod.questionnaire-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
+      {'name': 'prod.access-events', 'partitions': 1, 'retention_ms': 604800000},
+      {'name': 'prod.access-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
     ] if ptrain_prod_enabled else [])
     +
     ([
       {'name': 'test.questionnaire-events', 'partitions': 1, 'retention_ms': 604800000},
       {'name': 'test.questionnaire-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
+      {'name': 'test.access-events', 'partitions': 1, 'retention_ms': 604800000},
+      {'name': 'test.access-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
     ] if ptrain_test_enabled else [])
   }}
 
