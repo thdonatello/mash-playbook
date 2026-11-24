@@ -1,5 +1,4 @@
 ---
-
 - src: git+https://progressiv.radicle.garden/z2chD7Kt74JwEMafxTooxN7MaeYtK.git
   version: v26.9.0-0
   name: actual
@@ -845,7 +844,7 @@
   name: prunemate
   activation_prefix: prunemate_
 - src: git+ssh://git@gitlab.com/th-ansible/roles/ansible-role-ptrain.git
-  version: v0.0.0-1
+  version: v0.0.0-2
   name: ptrain
   activation_prefix: ptrain_
 - src: git+https://github.com/mother-of-all-self-hosting/ansible-role-qbittorrent.git
