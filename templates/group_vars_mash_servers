@@ -15271,6 +15271,8 @@ ptrain_kafka_topics: |
       {'name': 'prod.questionnaire-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
       {'name': 'prod.access-events', 'partitions': 1, 'retention_ms': 604800000},
       {'name': 'prod.access-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
+      {'name': 'prod.booking-events', 'partitions': 1, 'retention_ms': 604800000},
+      {'name': 'prod.booking-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
     ] if ptrain_prod_enabled else [])
     +
     ([
@@ -15278,6 +15280,8 @@ ptrain_kafka_topics: |
       {'name': 'test.questionnaire-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
       {'name': 'test.access-events', 'partitions': 1, 'retention_ms': 604800000},
       {'name': 'test.access-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
+      {'name': 'test.booking-events', 'partitions': 1, 'retention_ms': 604800000},
+      {'name': 'test.booking-events.dlq', 'partitions': 1, 'retention_ms': 2592000000},
     ] if ptrain_test_enabled else [])
   }}
 
